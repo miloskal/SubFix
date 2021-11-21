@@ -1,3 +1,5 @@
+from os import remove, rename
+
 # Removes <и> and <б> tags from file 
 def remove_tags(file_in, enc):
     if enc == "UTF-8 (Cyrillic)":

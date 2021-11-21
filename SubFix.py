@@ -1,4 +1,3 @@
-from os import remove, rename
 from sys import argv
 from regex import compile, match
 from utility_functions import *
@@ -53,36 +52,36 @@ class MainWindow(QDialog):
         if old_codepage == "Windows 1250 (Latin)" and\
             new_codepage == "UTF-8 (Latin)":
             # cp1250 --> utf8 latin
-            self.cp1250_to_utf8(self.filename)
+            cp1250_to_utf8(self.filename)
             self.success("Conversion cp1250 --> utf8(latin) done")
         elif old_codepage == "Windows 1250 (Latin)" and\
              new_codepage == "UTF-8 (Cyrillic)":
             # cp1250 --> utf8 cyrillic
-            self.cp1250_to_utf8(self.filename)
-            self.utf8_convert(self.filename, direction="cyr")
+            cp1250_to_utf8(self.filename)
+            utf8_convert(self.filename, direction="cyr")
             remove_tags(self.filename, new_codepage)
             self.success("Conversion cp1250 --> utf8(cyrillic) done")
         elif old_codepage == "UTF-8 (Cyrillic)" and\
              new_codepage == "UTF-8 (Latin)":
             # utf8 cyrillic --> utf8 latin
-            self.utf8_convert(self.filename, direction="lat")
+            utf8_convert(self.filename, direction="lat")
             self.success("Conversion utf8(cyrillic) --> utf8(latin) done")
         elif old_codepage == "UTF-8 (Latin)" and\
              new_codepage == "UTF-8 (Cyrillic)":
             # utf8 latin --> utf8 cyrillic
-            self.utf8_convert(self.filename, direction="cyr")
+            utf8_convert(self.filename, direction="cyr")
             remove_tags(self.filename, new_codepage)
             self.success("Conversion utf8(latin) --> utf8(cyrillic) done")
         elif old_codepage == "UTF-8 (Latin)" and\
              new_codepage == "Windows 1250 (Latin)":
             # utf8 latin --> cp1250
-            self.utf8_to_cp1250(self.filename)
+            utf8_to_cp1250(self.filename)
             self.success("Conversion utf8(latin) --> cp1250 done")
         elif old_codepage == "UTF-8 (Cyrillic)" and\
              new_codepage == "Windows 1250 (Latin)":
             # utf8 cyrillic --> cp1250
-            self.utf8_convert(self.filename, direction="lat")
-            self.utf8_to_cp1250(self.filename)
+            utf8_convert(self.filename, direction="lat")
+            utf8_to_cp1250(self.filename)
             self.success("Conversion utf8(cyrillic) --> cp1250 done")
         else:
             self.failure("Conversion failed.")
@@ -107,7 +106,7 @@ class MainWindow(QDialog):
                 for line in f:
                     match = self.TIMESTAMP_LINE_REGEX.match(line)
                     if match:
-                        result = self.correct_fps_in_line(match.group(), old_fps, new_fps)
+                        result = correct_fps_in_line(match.group(), old_fps, new_fps)
                         out.write(result + "\n")
                     else:
                         out.write(line)
@@ -136,9 +135,12 @@ class MainWindow(QDialog):
                         out.write(result + "\n")
                     else:
                         out.write(line)
+        remove (input)
+        rename (output, input)
+        self.success("Done")
 
     def success(self, message):
-        window = QMessageBox.information(self, "Done", message)
+        window = QMessageBox.information(self, "Success", message)
         
     def failure(self, message):
         window = QMessageBox.critical(self, "Failure", message)
