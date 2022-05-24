@@ -1,9 +1,12 @@
+#!/usr/bin/python3
+
 from sys import argv
 from regex import compile, match
-from utility_functions import *
+from utilityFunctions import *
 
 from PyQt5.QtWidgets import QApplication, QWidget, QDialog, QFileDialog, \
-    QComboBox, QMessageBox
+    QComboBox, QMessageBox, QAbstractItemView, QShortcut
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QKeySequence, QIcon
 import PyQt5.uic as uic
 from pathlib import Path
 from platform import system
@@ -20,77 +23,89 @@ class MainWindow(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.ui = uic.loadUi("layout.ui", self)
-        self.ui.browseFpsPushButton.released.connect(self.browse_for_subtitle)
-        self.ui.browseCodepagePushButton.released.connect(self.browse_for_subtitle)
-        self.ui.browseRewindPushButton.released.connect(self.browse_for_subtitle)
-        self.ui.fixFpsPushButton.released.connect(self.correct_subtitle_fps)
-        self.ui.translateCodepagePushButton.released.connect(self.translate_codepage)
-        self.ui.rewindPushButton.released.connect(self.rewind_subtitle)
-
+        self.setWindowIcon(QIcon("icon.png"))
+        self.ui.browseFpsPushButton.released.connect(self.browseForSubtitle)
+        self.ui.browseCodepagePushButton.released.connect(self.browseForSubtitle)
+        self.ui.browseRewindPushButton.released.connect(self.browseForSubtitle)
+        self.ui.fixFpsPushButton.released.connect(self.correctSubtitleFps)
+        self.ui.translateCodepagePushButton.released.connect(self.translateCodepage)
+        self.ui.rewindPushButton.released.connect(self.rewindSubtitle)
+        self.model = QStandardItemModel()
+        self.ui.rewindSubtitlesListView.setModel(self.model)
+        self.ui.fpsSubtitlesListView.setModel(self.model)
+        self.ui.codepageSubtitlesListView.setModel(self.model)
+        self.ui.rewindSubtitlesListView.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.fpsSubtitlesListView.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.codepageSubtitlesListView.setSelectionMode(QAbstractItemView.NoSelection)
 
     #slot
-    def browse_for_subtitle(self):
+    def browseForSubtitle(self):
         if __platform__ == "Linux":
             directory = "/home"
         elif __platform__ == "Windows":
             directory = "C:\\\\Users"
-        self.filename = QFileDialog.getOpenFileName(parent=self, directory=directory,
-                                             caption="Browse for subtitle",
+        self.filenames = QFileDialog.getOpenFileNames(parent=self, directory=directory,
+                                             caption="Browse for subtitles",
                                              filter="Subtitle files (*.srt | *.txt)")
-        self.filename = self.filename[0]
-        self.ui.filePathFpsLabel.setText(self.filename)
-        self.ui.filePathCodepageLabel.setText(self.filename)
-        self.ui.filePathRewindLabel.setText(self.filename)
-
-        print(f"filename={self.filename}")
+        self.filenames = self.filenames[0]
+        for filename in self.filenames:
+            item = QStandardItem(filename)
+            item.setEditable(False)
+            self.model.appendRow(item)
 
 
     #slot
-    def translate_codepage(self):
-        old_codepage = self.ui.oldCodepageComboBox.currentText()
-        new_codepage = self.ui.newCodepageComboBox.currentText()
-        if old_codepage == "Windows 1250 (Latin)" and\
-            new_codepage == "UTF-8 (Latin)":
+    def translateCodepage(self):
+        oldCodepage = self.ui.oldCodepageComboBox.currentText()
+        newCodepage = self.ui.newCodepageComboBox.currentText()
+        if oldCodepage == "Windows 1250 (Latin)" and\
+            newCodepage == "UTF-8 (Latin)":
             # cp1250 --> utf8 latin
-            cp1250_to_utf8(self.filename)
+            for filename in self.filenames:
+                cp1250ToUtf8(filename)
             self.success("Conversion cp1250 --> utf8(latin) done")
-        elif old_codepage == "Windows 1250 (Latin)" and\
-             new_codepage == "UTF-8 (Cyrillic)":
+        elif oldCodepage == "Windows 1250 (Latin)" and\
+             newCodepage == "UTF-8 (Cyrillic)":
             # cp1250 --> utf8 cyrillic
-            cp1250_to_utf8(self.filename)
-            utf8_convert(self.filename, direction="cyr")
-            remove_tags(self.filename, new_codepage)
+            for filename in self.filenames:
+                cp1250ToUtf8(filename)
+                utf8Convert(filename, direction="cyr")
+                removeTags(filename, newCodepage)
             self.success("Conversion cp1250 --> utf8(cyrillic) done")
-        elif old_codepage == "UTF-8 (Cyrillic)" and\
-             new_codepage == "UTF-8 (Latin)":
+        elif oldCodepage == "UTF-8 (Cyrillic)" and\
+             newCodepage == "UTF-8 (Latin)":
             # utf8 cyrillic --> utf8 latin
-            utf8_convert(self.filename, direction="lat")
+            for filename in self.filenames:
+                utf8Convert(filename, direction="lat")
             self.success("Conversion utf8(cyrillic) --> utf8(latin) done")
-        elif old_codepage == "UTF-8 (Latin)" and\
-             new_codepage == "UTF-8 (Cyrillic)":
+        elif oldCodepage == "UTF-8 (Latin)" and\
+             newCodepage == "UTF-8 (Cyrillic)":
             # utf8 latin --> utf8 cyrillic
-            utf8_convert(self.filename, direction="cyr")
-            remove_tags(self.filename, new_codepage)
+            for filename in self.filenames:
+                utf8Convert(filename, direction="cyr")
+                removeTags(filename, newCodepage)
             self.success("Conversion utf8(latin) --> utf8(cyrillic) done")
-        elif old_codepage == "UTF-8 (Latin)" and\
-             new_codepage == "Windows 1250 (Latin)":
+        elif oldCodepage == "UTF-8 (Latin)" and\
+             newCodepage == "Windows 1250 (Latin)":
             # utf8 latin --> cp1250
-            utf8_to_cp1250(self.filename)
+            for filename in self.filenames:
+                utf8ToCp1250(filename)
             self.success("Conversion utf8(latin) --> cp1250 done")
-        elif old_codepage == "UTF-8 (Cyrillic)" and\
-             new_codepage == "Windows 1250 (Latin)":
+        elif oldCodepage == "UTF-8 (Cyrillic)" and\
+             newCodepage == "Windows 1250 (Latin)":
             # utf8 cyrillic --> cp1250
-            utf8_convert(self.filename, direction="lat")
-            utf8_to_cp1250(self.filename)
+            for filename in self.filenames:
+                utf8Convert(filename, direction="lat")
+                utf8ToCp1250(filename)
             self.success("Conversion utf8(cyrillic) --> cp1250 done")
         else:
             self.failure("Conversion failed.")
 
 
     #slot
-    def correct_subtitle_fps(self):
-        old_fps = float(self.ui.oldFpsComboBox.currentText())
-        new_fps = float(self.ui.newFpsComboBox.currentText())
+    def correctSubtitleFps(self):
+        oldFps = float(self.ui.oldFpsComboBox.currentText())
+        newFps = float(self.ui.newFpsComboBox.currentText())
         enc = self.ui.fpsEncodingComboBox.currentText()
         if enc == "Windows 1250 (Latin)":
             encoding = "cp1250"
@@ -99,22 +114,21 @@ class MainWindow(QDialog):
         else:
             self.failure("Invalid encoding")
             return
-        input = self.filename
-        output = f"{input}.out"
-        with open(output, "w", encoding=encoding) as out:
-            with open(input,encoding=encoding) as f:
-                for line in f:
-                    match = self.TIMESTAMP_LINE_REGEX.match(line)
-                    if match:
-                        result = correct_fps_in_line(match.group(), old_fps, new_fps)
-                        out.write(result + "\n")
-                    else:
-                        out.write(line)
-
-
+        for filename in self.filenames:
+            input = filename
+            output = f"{input}.out"
+            with open(output, "w", encoding=encoding) as out:
+                with open(input,encoding=encoding) as f:
+                    for line in f:
+                        match = self.TIMESTAMP_LINE_REGEX.match(line)
+                        if match:
+                            result = correctFpsInLine(match.group(), oldFps, newFps)
+                            out.write(result + "\n")
+                        else:
+                            out.write(line)
 
     #slot
-    def rewind_subtitle(self):
+    def rewindSubtitle(self):
         enc = self.ui.rewindEncodingComboBox.currentText()
         if enc == "Windows 1250 (Latin)":
             encoding = "cp1250"
@@ -124,19 +138,20 @@ class MainWindow(QDialog):
             self.failure("Invalid encoding")
             return
         delay = int(self.ui.rewindMilisecondsLineEdit.text())
-        input = self.filename
-        output = f"{input}.out"
-        with open(output, "w", encoding=encoding) as out:
-            with open(input, encoding=encoding) as f:
-                for line in f:
-                    match = self.TIMESTAMP_LINE_REGEX.match(line)
-                    if match:
-                        result = rewind_line(match.group(), delay)
-                        out.write(result + "\n")
-                    else:
-                        out.write(line)
-        remove (input)
-        rename (output, input)
+        for filename in self.filenames:
+            input = filename
+            output = f"{input}.out"
+            with open(output, "w", encoding=encoding) as out:
+                with open(input, encoding=encoding) as f:
+                    for line in f:
+                        match = self.TIMESTAMP_LINE_REGEX.match(line)
+                        if match:
+                            result = rewindLine(match.group(), delay)
+                            out.write(result + "\n")
+                        else:
+                            out.write(line)
+            remove (input)
+            rename (output, input)
         self.success("Done")
 
     def success(self, message):

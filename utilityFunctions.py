@@ -1,45 +1,45 @@
 from os import remove, rename
 
 # Removes <и> and <б> tags from file 
-def remove_tags(file_in, enc):
+def removeTags(fileIn, enc):
     if enc == "UTF-8 (Cyrillic)":
         encoding = "utf-8"
     else:
         return
-    with open (f"{file_in}_", "w", encoding=encoding) as g:
-        with open (f"{file_in}", "r", encoding=encoding) as f:
+    with open (f"{fileIn}_", "w", encoding=encoding) as g:
+        with open (f"{fileIn}", "r", encoding=encoding) as f:
             for line in f:
                 print(line.rstrip().replace("<и>", "").\
                                     replace("</и>", "").\
                                     replace("<б>","").\
                                     replace("</б>",""), file=g)
-    remove(file_in)
-    rename(f"{file_in}_", f"{file_in}")
+    remove(fileIn)
+    rename(f"{fileIn}_", f"{fileIn}")
 
 
-def frame_to_timestamp(current_frame, fps):
-    miliseconds_per_frame = 1000 / fps
-    miliseconds = miliseconds_per_frame * current_frame
-    timestamp = miliseconds_to_timestamp(miliseconds)
+def frameToTimestamp(currentFrame, fps):
+    milisecondsPerFrame = 1000 / fps
+    miliseconds = milisecondsPerFrame * currentFrame
+    timestamp = milisecondsToTimestamp(miliseconds)
     return timestamp
 
-def timestamp_to_frame(timestamp, fps):
-    miliseconds_per_frame = 1000 / fps
-    ms = float(timestamp_to_miliseconds(timestamp))
-    frame = ms // miliseconds_per_frame
+def timestampToFrame(timestamp, fps):
+    milisecondsPerFrame = 1000 / fps
+    ms = float(timestampToMiliseconds(timestamp))
+    frame = ms // milisecondsPerFrame
     return frame
 
-def timestamp_to_miliseconds(timestamp):
-    hours, minutes, secs_and_ms = timestamp.split(":")
+def timestampToMiliseconds(timestamp):
+    hours, minutes, secsAndMs = timestamp.split(":")
     hours = float(hours)
     minutes = float(minutes)
-    seconds, miliseconds = secs_and_ms.split(",")
+    seconds, miliseconds = secsAndMs.split(",")
     seconds = float(seconds)
     miliseconds = float(miliseconds)
-    total_ms = miliseconds + seconds * 1000 + minutes * 60000 + hours * 3600000
-    return total_ms
+    totalMs = miliseconds + seconds * 1000 + minutes * 60000 + hours * 3600000
+    return totalMs
 
-def miliseconds_to_timestamp(ms):
+def milisecondsToTimestamp(ms):
     miliseconds = int(ms % 1000)
     seconds = int(ms // 1000)
     hours = int(seconds // 3600)
@@ -51,7 +51,7 @@ def miliseconds_to_timestamp(ms):
 
 
 # cp1250 (aka windows-1250) --------> utf-8
-def cp1250_to_utf8(file_in):
+def cp1250ToUtf8(fileIn):
 
     cp1250 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("cp1250").decode("cp1250")
     cp1250 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("cp1250").decode("cp1250")
@@ -59,17 +59,17 @@ def cp1250_to_utf8(file_in):
     utf8 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("utf-8").decode("utf-8")
     utf8 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("utf-8").decode("utf-8")
 
-    with open(f"{file_in}.utf8", "w", encoding="utf-8") as g:
-        with open(file_in, "r", errors="ignore", encoding="cp1250") as f:
+    with open(f"{fileIn}.utf8", "w", encoding="utf-8") as g:
+        with open(fileIn, "r", errors="ignore", encoding="cp1250") as f:
             for line in f:
                 table = line.maketrans(cp1250, utf8)
                 line = line.translate(table).rstrip()
                 print(line, file=g)
-    remove(file_in)
-    rename(f"{file_in}.utf8", file_in)
+    remove(fileIn)
+    rename(f"{fileIn}.utf8", fileIn)
 
 # utf8 ------------> cp1250 (aka windows-1250)
-def utf8_to_cp1250(file_in):
+def utf8ToCp1250(fileIn):
 
     cp1250 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("cp1250").decode("cp1250")
     cp1250 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("cp1250").decode("cp1250")
@@ -77,26 +77,26 @@ def utf8_to_cp1250(file_in):
     utf8 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("utf-8").decode("utf-8")
     utf8 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("utf-8").decode("utf-8")
 
-    with open(f"{file_in}.cp1250", "w", encoding="cp1250") as g:
-        with open(file_in, "r", errors="ignore", encoding="utf-8") as f:
+    with open(f"{fileIn}.cp1250", "w", encoding="cp1250") as g:
+        with open(fileIn, "r", errors="ignore", encoding="utf-8") as f:
             for line in f:
                 table = line.maketrans(utf8, cp1250)
                 line = line.translate(table).rstrip()
                 print(line, file=g)
-    remove(file_in)
-    rename(f"{file_in}.cp1250", file_in)
+    remove(fileIn)
+    rename(f"{fileIn}.cp1250", fileIn)
 
 
-def utf8_convert(file_in, direction="cyr"):
+def utf8Convert(fileIn, direction="cyr"):
     """
     UTF-8 latin <-----------> UTF-8 cyrillic conversion (Serbian language)
 
-    file_in - input file name
+    fileIn - input file name
     direction - eighter "cyr"(default) to convert from latin to cyrillic or 
                         "lat" to convert from cyrillic to latin
     """
     encoding = "utf-8"
-    lat2cyr_dic = {
+    lat2cyrDic = {
         65: 1040, #A <--> A
         66: 1041, #B <--> Б
         67: 1062, #C <--> Ц
@@ -153,42 +153,42 @@ def utf8_convert(file_in, direction="cyr"):
         382: 1078  #ž <--> ж
         }
 
-    cyr2lat_dic = {v: k for k, v in lat2cyr_dic.items()}
+    cyr2latDic = {v: k for k, v in lat2cyrDic.items()}
 
     # latin ------------------------> cyrillic
     if direction == "cyr":
-        with open(f"{file_in}.cyr_", "w", encoding=encoding) as out:    
-            with open(file_in, "r", encoding=encoding) as f:
+        with open(f"{fileIn}.cyr_", "w", encoding=encoding) as out:    
+            with open(fileIn, "r", encoding=encoding) as f:
                 for line in f:
                     for ch in line: # convert utf-8 number to his corresponding number from dictionary
                         w = ord(ch)
-                        v = lat2cyr_dic.get(w)  
+                        v = lat2cyrDic.get(w)  
                         if v != None: 
                             out.write(chr(v))
                         else:
                             out.write(ch)
 
-        with open(f"{file_in}.cyr", "w", encoding=encoding) as out: # fix letters џ, њ, љ 
-            with open(f"{file_in}.cyr_", "r", encoding=encoding) as f:
+        with open(f"{fileIn}.cyr", "w", encoding=encoding) as out: # fix letters џ, њ, љ 
+            with open(f"{fileIn}.cyr_", "r", encoding=encoding) as f:
                 for line in f:
-                    fixed_line = line.replace("дж", "џ").replace("Дж", "Џ").replace("ДЖ", "Џ").replace("НЈ", "Њ").replace("Нј", "Њ").replace("нј","њ").replace("ЛЈ", "Љ").replace("Лј", "Љ").replace("лј","љ")
-                    out.write(fixed_line)
+                    fixedLine = line.replace("дж", "џ").replace("Дж", "Џ").replace("ДЖ", "Џ").replace("НЈ", "Њ").replace("Нј", "Њ").replace("нј","њ").replace("ЛЈ", "Љ").replace("Лј", "Љ").replace("лј","љ")
+                    out.write(fixedLine)
         
-        remove(file_in)
-        remove(f"{file_in}.cyr_")
-        rename(f"{file_in}.cyr", file_in)
+        remove(fileIn)
+        remove(f"{fileIn}.cyr_")
+        rename(f"{fileIn}.cyr", fileIn)
                     
                     
     # cyrillic ------------------------> latin
     elif direction == "lat":
-        with open(f"{file_in}.lat", "w", encoding=encoding) as out:    
-            with open(file_in, "r", encoding=encoding) as f:
+        with open(f"{fileIn}.lat", "w", encoding=encoding) as out:    
+            with open(fileIn, "r", encoding=encoding) as f:
                 for line in f:
                     # convert utf-8 number to his corresponding 
                     # number in dictionary
                     for ch in line: 
                         w = ord(ch)
-                        v = cyr2lat_dic.get(w)  
+                        v = cyr2latDic.get(w)  
                         if v != None: 
                             out.write(chr(v))
                         elif w == 1039: # Џ --> Dž 
@@ -205,26 +205,26 @@ def utf8_convert(file_in, direction="cyr"):
                             out.write("nj")
                         else:
                             out.write(ch)
-        remove(file_in)
-        rename(f"{file_in}.lat", file_in)
+        remove(fileIn)
+        rename(f"{fileIn}.lat", fileIn)
 
 
-def rewind_line(line,delay):
+def rewindLine(line,delay):
     timestamp1, timestamp2 = line.split(" --> ")
-    ms1 = timestamp_to_miliseconds(timestamp1)
-    ms2 = timestamp_to_miliseconds(timestamp2)
+    ms1 = timestampToMiliseconds(timestamp1)
+    ms2 = timestampToMiliseconds(timestamp2)
     ms1 += delay
     ms2 += delay
-    timestamp1 = miliseconds_to_timestamp(ms1)
-    timestamp2 = miliseconds_to_timestamp(ms2)
+    timestamp1 = milisecondsToTimestamp(ms1)
+    timestamp2 = milisecondsToTimestamp(ms2)
     result = f"{timestamp1} --> {timestamp2}"
     return result
 
-def correct_fps_in_line(line,old_fps,new_fps):
+def correctFpsInLine(line,oldFps,newFps):
     timestamp1, timestamp2 = line.split(" --> ")
-    frame1 = timestamp_to_frame(timestamp1, old_fps)
-    timestamp1 = frame_to_timestamp(frame1, new_fps)
-    frame2 = timestamp_to_frame(timestamp2, old_fps)
-    timestamp2 = frame_to_timestamp(frame2, new_fps)
+    frame1 = timestampToFrame(timestamp1, oldFps)
+    timestamp1 = frameToTimestamp(frame1, newFps)
+    frame2 = timestampToFrame(timestamp2, oldFps)
+    timestamp2 = frameToTimestamp(frame2, newFps)
     result = f"{timestamp1} --> {timestamp2}"
     return result
