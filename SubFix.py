@@ -4,10 +4,10 @@ from sys import argv
 from regex import compile, match
 from utilityFunctions import *
 
-from PyQt5.QtWidgets import QApplication, QWidget, QDialog, QFileDialog, \
-    QComboBox, QMessageBox, QAbstractItemView, QShortcut
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QKeySequence, QIcon
-import PyQt5.uic as uic
+from PyQt6.QtWidgets import QApplication, QWidget, QDialog, QFileDialog, \
+    QComboBox, QMessageBox, QAbstractItemView
+from PyQt6.QtGui import QStandardItemModel, QStandardItem, QKeySequence, QIcon, QShortcut
+import PyQt6.uic as uic
 from pathlib import Path
 from platform import system
 
@@ -40,10 +40,10 @@ class MainWindow(QDialog):
         self.ui.fpsSubtitlesListView.setModel(self.model)
         self.ui.codepageSubtitlesListView.setModel(self.model)
         self.ui.convertToSrtListView.setModel(self.modelSub)
-        self.ui.rewindSubtitlesListView.setSelectionMode(QAbstractItemView.NoSelection)
-        self.ui.fpsSubtitlesListView.setSelectionMode(QAbstractItemView.NoSelection)
-        self.ui.codepageSubtitlesListView.setSelectionMode(QAbstractItemView.NoSelection)
-        self.ui.convertToSrtListView.setSelectionMode(QAbstractItemView.NoSelection)
+        self.ui.rewindSubtitlesListView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        self.ui.fpsSubtitlesListView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        self.ui.codepageSubtitlesListView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        self.ui.convertToSrtListView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
 
     #slot
     def convertToSrt(self):
@@ -218,7 +218,7 @@ if __name__ == "__main__":
     window = MainWindow()
     window.setWindowTitle("Subtitle Fixer")
     window.show()
-    app.exec_()
+    app.exec()
 
 
 
