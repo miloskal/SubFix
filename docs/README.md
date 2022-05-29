@@ -14,8 +14,11 @@ SubFix is cross-platform solution for subtitle (.srt and .sub) synchronization, 
 
 ## Prerequisites
 
-- Windows/Linux/Mac
 - python3
+- pip3 - python3 package manager:
+```bash
+sudo apt-get install python3-pip
+```
 
 ## Installation
 
