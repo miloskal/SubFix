@@ -12,6 +12,11 @@ SubFix is cross-platform solution for subtitle (.srt and .sub) synchronization, 
 - If subtitle author chose wrong FPS during movie translation, you can fix that using 'FPS' feature.
 - .srt format is more supported than .sub, so there is .sub --> .srt conversion.
 
+## Prerequisites
+
+- Windows/Linux/Mac
+- python3
+
 ## Installation
 
 Open Terminal and type:
