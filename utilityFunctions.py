@@ -61,20 +61,48 @@ Lat2CyrUtf8Dic = {
 Cyr2LatUtf8Dic = {v: k for k, v in Lat2CyrUtf8Dic.items()}
 
 # Removes <и> and <б> tags from file 
-def removeTags(fileIn, enc):
+def removeTags(file, enc):
     if enc == "UTF-8 (Cyrillic)":
         encoding = "utf-8"
+        with open (f"{file}_", "w", encoding=encoding) as g, \
+            open (f"{file}", "r", encoding=encoding) as f:
+            for line in f:
+                print(line.rstrip().replace("<и>", "").\
+                                    replace("</и>", "").\
+                                    replace("<б>","").\
+                                    replace("</б>",""), file=g)
+    elif enc == "UTF-8 (Latin)":
+        encoding = "utf-8"
+        with open (f"{file}_", "w", encoding=encoding) as g, \
+            open (f"{file}", "r", encoding=encoding) as f:
+            for line in f:
+                print(line.rstrip().replace("<i>", "").\
+                                    replace("</i>", "").\
+                                    replace("<b>","").\
+                                    replace("</b>",""), file=g)
+    elif enc == "Windows 1250 (Latin)":
+        encoding = "cp1250"
+        with open (f"{file}_", "w", encoding=encoding) as g, \
+            open (f"{file}", "r", encoding=encoding) as f:
+            for line in f:
+                print(line.rstrip().replace("<i>", "").\
+                                    replace("</i>", "").\
+                                    replace("<b>","").\
+                                    replace("</b>",""), file=g)
+    elif enc == "Windows 1251 (Cyrillic)":
+        encoding = "cp1251"
+        with open (f"{file}_", "w", encoding=encoding) as g, \
+            open (f"{file}", "r", encoding=encoding) as f:
+            for line in f:
+                print(line.rstrip().replace("<и>", "").\
+                                    replace("</и>", "").\
+                                    replace("<б>","").\
+                                    replace("</б>",""), file=g)
     else:
         return
-    with open (f"{fileIn}_", "w", encoding=encoding) as g, \
-         open (f"{fileIn}", "r", encoding=encoding) as f:
-        for line in f:
-            print(line.rstrip().replace("<и>", "").\
-                                replace("</и>", "").\
-                                replace("<б>","").\
-                                replace("</б>",""), file=g)
-    remove(fileIn)
-    rename(f"{fileIn}_", f"{fileIn}")
+
+    remove(file)
+    rename(f"{file}_", f"{file}")
 
 
 def frameToTimestamp(currentFrame, fps):
@@ -110,48 +138,54 @@ def milisecondsToTimestamp(ms):
     return result
 
 
-# cp1250 (aka windows-1250) --------> utf-8
-def cp1250ToUtf8(fileIn):
-
-    cp1250 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("cp1250").decode("cp1250")
-    cp1250 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("cp1250").decode("cp1250")
-
-    utf8 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("utf-8").decode("utf-8")
-    utf8 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("utf-8").decode("utf-8")
-
-    with open(f"{fileIn}.utf8", "w", encoding="utf-8") as g, \
-         open(fileIn, "r", errors="ignore", encoding="cp1250") as f:
+def cp1250ToUtf8(file):
+    with open(f"{file}.utf8", "w", encoding="utf-8") as g, \
+         open(file, "r", errors="ignore", encoding="cp1250") as f:
         for line in f:
-            table = line.maketrans(cp1250, utf8)
-            line = line.translate(table).rstrip()
-            print(line, file=g)
-    remove(fileIn)
-    rename(f"{fileIn}.utf8", fileIn)
+            print(line.rstrip(), file=g)
+    remove(file)
+    rename(f"{file}.utf8", file)
 
-# utf8 ------------> cp1250 (aka windows-1250)
-def utf8ToCp1250(fileIn):
-
-    cp1250 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("cp1250").decode("cp1250")
-    cp1250 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("cp1250").decode("cp1250")
-
-    utf8 = "abvgdđežzijklljmnnjoprstufhcčdžš".encode("utf-8").decode("utf-8")
-    utf8 += "ABVGDĐEŽZIJKLLJMNNJOPRSTUFHCČDŽŠ".encode("utf-8").decode("utf-8")
-
-    with open(f"{fileIn}.cp1250", "w", encoding="cp1250") as g, \
-         open(fileIn, "r", errors="ignore", encoding="utf-8") as f:
+def cp1251ToUtf8(file):
+    with open(f"{file}.utf8", "w", encoding="utf-8") as g, \
+         open(file, "r", errors="ignore", encoding="cp1251") as f:
         for line in f:
-            table = line.maketrans(utf8, cp1250)
-            line = line.translate(table).rstrip()
-            print(line, file=g)
-    remove(fileIn)
-    rename(f"{fileIn}.cp1250", fileIn)
+            print(line.rstrip(), file=g)
+    remove(file)
+    rename(f"{file}.utf8", file)
+
+def cp1250ToCp1251(file):
+    cp1250ToUtf8(file)
+    utf8Convert(file, direction="cyr")
+    utf8ToCp1251(file)
+
+def cp1251ToCp1250(file):
+    cp1251ToUtf8(file)
+    utf8Convert(file, direction="lat")
+    utf8ToCp1250(file)
+
+def utf8ToCp1250(file):
+    with open(f"{file}.cp1250", "w", encoding="cp1250") as g, \
+         open(file, "r", errors="ignore", encoding="utf-8") as f:
+        for line in f:
+            print(line.rstrip(), file=g)
+    remove(file)
+    rename(f"{file}.cp1250", file)
+
+def utf8ToCp1251(file):
+    with open(f"{file}.cp1251", "w", encoding="cp1251") as g, \
+         open(file, "r", errors="ignore", encoding="utf-8") as f:
+        for line in f:
+            print(line.rstrip(), file=g)
+    remove(file)
+    rename(f"{file}.cp1251", file)
 
 
-def utf8Convert(fileIn, direction="cyr"):
+def utf8Convert(file, direction="cyr"):
     """
     UTF-8 latin <-----------> UTF-8 cyrillic conversion (Serbian language)
 
-    fileIn - input file name
+    file - input file name
     direction - eighter "cyr"(default) to convert from latin to cyrillic or 
                         "lat" to convert from cyrillic to latin
     """
@@ -160,8 +194,8 @@ def utf8Convert(fileIn, direction="cyr"):
 
     # latin ------------------------> cyrillic
     if direction == "cyr":
-        with open(f"{fileIn}.cyr_", "w", encoding=enc) as out, \
-             open(fileIn, "r", encoding=enc) as f:
+        with open(f"{file}.cyr_", "w", encoding=enc) as out, \
+             open(file, "r", encoding=enc) as f:
             for line in f:
                 for ch in line: # convert utf-8 number to his corresponding number from dictionary
                     w = ord(ch)
@@ -171,21 +205,21 @@ def utf8Convert(fileIn, direction="cyr"):
                     else:
                         out.write(ch)
         # fix letters џ, њ, љ
-        with open(f"{fileIn}.cyr", "w", encoding=enc) as out, \
-             open(f"{fileIn}.cyr_", "r", encoding=enc) as f:
+        with open(f"{file}.cyr", "w", encoding=enc) as out, \
+             open(f"{file}.cyr_", "r", encoding=enc) as f:
             for line in f:
                 fixedLine = line.replace("дж", "џ").replace("Дж", "Џ").replace("ДЖ", "Џ").replace("НЈ", "Њ").replace("Нј", "Њ").replace("нј","њ").replace("ЛЈ", "Љ").replace("Лј", "Љ").replace("лј","љ")
                 out.write(fixedLine)
         
-        remove(fileIn)
-        remove(f"{fileIn}.cyr_")
-        rename(f"{fileIn}.cyr", fileIn)
+        remove(file)
+        remove(f"{file}.cyr_")
+        rename(f"{file}.cyr", file)
                     
                     
     # cyrillic ------------------------> latin
     elif direction == "lat":
-        with open(f"{fileIn}.lat", "w", encoding=enc) as out, \
-             open(fileIn, "r", encoding=enc) as f:
+        with open(f"{file}.lat", "w", encoding=enc) as out, \
+             open(file, "r", encoding=enc) as f:
             for line in f:
                 # convert utf-8 number to his corresponding 
                 # number in dictionary
@@ -208,8 +242,8 @@ def utf8Convert(fileIn, direction="cyr"):
                         out.write("nj")
                     else:
                         out.write(ch)
-        remove(fileIn)
-        rename(f"{fileIn}.lat", fileIn)
+        remove(file)
+        rename(f"{file}.lat", file)
 
 
 def rewindLine(line, delay):

@@ -54,6 +54,8 @@ class MainWindow(QDialog):
         fps = float(self.ui.convertToSrtFpsComboBox.currentText())
         if encoding == "Windows 1250 (Latin)":
             enc = "cp1250"
+        elif encoding == "Windows 1251 (Cyrillic)":
+            enc = "cp1251"
         else:
             enc = "utf-8"
         for file in self.filenamesSub:
@@ -114,46 +116,73 @@ class MainWindow(QDialog):
         newCodepage = self.ui.newCodepageComboBox.currentText()
         if oldCodepage == "Windows 1250 (Latin)" and\
             newCodepage == "UTF-8 (Latin)":
-            # cp1250 --> utf8 latin
             for file in self.filenames:
                 cp1250ToUtf8(file)
             self.success("Conversion cp1250 --> utf8(latin) done")
         elif oldCodepage == "Windows 1250 (Latin)" and\
+             newCodepage == "Windows 1251 (Cyrillic)":
+            for file in self.filenames:
+                cp1250ToCp1251(file)
+            self.success("Conversion cp1250(latin) --> cp1251(cyrillic) done")
+        elif oldCodepage == "Windows 1251 (Cyrillic)" and\
+             newCodepage == "Windows 1250 (Latin)":
+            for file in self.filenames:
+                cp1251ToCp1250(file)
+            self.success("Conversion cp1251(cyrillic) --> cp1250(latin) done")
+        elif oldCodepage == "Windows 1250 (Latin)" and\
              newCodepage == "UTF-8 (Cyrillic)":
-            # cp1250 --> utf8 cyrillic
             for file in self.filenames:
                 cp1250ToUtf8(file)
                 utf8Convert(file, direction="cyr")
-                removeTags(file, newCodepage)
             self.success("Conversion cp1250 --> utf8(cyrillic) done")
         elif oldCodepage == "UTF-8 (Cyrillic)" and\
              newCodepage == "UTF-8 (Latin)":
-            # utf8 cyrillic --> utf8 latin
             for file in self.filenames:
                 utf8Convert(file, direction="lat")
             self.success("Conversion utf8(cyrillic) --> utf8(latin) done")
         elif oldCodepage == "UTF-8 (Latin)" and\
              newCodepage == "UTF-8 (Cyrillic)":
-            # utf8 latin --> utf8 cyrillic
             for file in self.filenames:
                 utf8Convert(file, direction="cyr")
-                removeTags(file, newCodepage)
             self.success("Conversion utf8(latin) --> utf8(cyrillic) done")
         elif oldCodepage == "UTF-8 (Latin)" and\
              newCodepage == "Windows 1250 (Latin)":
-            # utf8 latin --> cp1250
             for file in self.filenames:
                 utf8ToCp1250(file)
             self.success("Conversion utf8(latin) --> cp1250 done")
         elif oldCodepage == "UTF-8 (Cyrillic)" and\
              newCodepage == "Windows 1250 (Latin)":
-            # utf8 cyrillic --> cp1250
             for file in self.filenames:
                 utf8Convert(file, direction="lat")
                 utf8ToCp1250(file)
             self.success("Conversion utf8(cyrillic) --> cp1250 done")
+        elif oldCodepage == "Windows 1251 (Cyrillic)" and\
+             newCodepage == "UTF-8 (Cyrillic)":
+            for file in self.filenames:
+                cp1251ToUtf8(file)
+            self.success("Conversion cp1251(cyrillic) --> utf8(cyrillic) done")
+        elif oldCodepage == "Windows 1251 (Cyrillic)" and\
+             newCodepage == "UTF-8 (Latin)":
+            for file in self.filenames:
+                cp1251ToUtf8(file)
+                utf8Convert(file, direction="lat")
+            self.success("Conversion cp1251(cyrillic) --> utf8(latin) done")
+        elif oldCodepage == "UTF-8 (Cyrillic)" and\
+             newCodepage == "Windows 1251 (Cyrillic)":
+            for file in self.filenames:
+                utf8ToCp1251(file)
+            self.success("Conversion utf8(cyrillic) --> cp1251(cyrillic) done")
+        elif oldCodepage == "UTF-8 (Latin)" and\
+             newCodepage == "Windows 1251 (Cyrillic)":
+            for file in self.filenames:
+                utf8Convert(file, direction="cyr")
+                utf8ToCp1251(file)
         else:
             self.failure("Conversion failed.")
+            return
+        
+        for file in self.filenames:
+            removeTags(file, newCodepage)
 
 
     #slot
@@ -163,6 +192,8 @@ class MainWindow(QDialog):
         enc = self.ui.fpsEncodingComboBox.currentText()
         if enc == "Windows 1250 (Latin)":
             encoding = "cp1250"
+        elif enc == "Windows 1251 (Cyrillic)":
+            encoding = "cp1251"
         elif enc == "UTF-8":
             encoding = "utf-8"
         else:
@@ -185,6 +216,8 @@ class MainWindow(QDialog):
         enc = self.ui.rewindEncodingComboBox.currentText()
         if enc == "Windows 1250 (Latin)":
             encoding = "cp1250"
+        elif enc == "Windows 1251 (Cyrillic)":
+            encoding = "cp1251"
         elif enc == "UTF-8":
             encoding = "utf-8"
         else:
