@@ -5,7 +5,7 @@ SubFix is cross-platform solution for subtitle (.srt and .sub) synchronization, 
 <img src="fps.png" width="400"> <img src="codepage.png" width="400">
 <img src="rewind.png" width="400"> <img src="sub to srt.png" width="400">
 
-# Use cases
+## Use cases
 
 - UTF-8 (Cyrillic or Latin) <--> Windows 1250 (Latin) codepage conversion.
 - You want to hardcode subtitle into movie. So, before rendering video, delay in subtitle must be removed first. It can be performed using 'rewind' feature.
