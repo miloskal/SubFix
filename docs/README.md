@@ -27,7 +27,7 @@ Open Terminal and type:
 pip3 install -r requirements.txt
 ```
 
-## Launch The Application
+## Running
 
 Double-click on SubFix.py or open Terminal and type:
 ```bash
