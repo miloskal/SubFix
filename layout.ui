@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -210,9 +210,9 @@
       <attribute name="title">
        <string>Codepage</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
+        <layout class="QVBoxLayout" name="verticalLayout_7">
          <item>
           <widget class="QPushButton" name="browseCodepagePushButton">
            <property name="sizePolicy">
@@ -227,50 +227,22 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QListView" name="codepageSubtitlesListView">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subtitles&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QListView" name="codepageSubtitlesListView">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subtitles&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="1" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
             <widget class="QLabel" name="label_6">
              <property name="text">
               <string>Old Codepage:</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QComboBox" name="newCodepageComboBox">
-             <item>
-              <property name="text">
-               <string>Windows 1250 (Latin)</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Windows 1251 (Cyrillic)</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>UTF-8 (Latin)</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>UTF-8 (Cyrillic)</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="1">
+           <item>
             <widget class="QComboBox" name="oldCodepageComboBox">
              <item>
               <property name="text">
@@ -294,14 +266,44 @@
              </item>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>New Codepage:</string>
-             </property>
-            </widget>
-           </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="codepagesGroupBox">
+           <property name="title">
+            <string>New Codepages:</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QCheckBox" name="cp1250CheckBox">
+              <property name="text">
+               <string>Windows 1250 (Latin)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="cp1251CheckBox">
+              <property name="text">
+               <string>Windows 1251 (Cyrillic)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="utf8LatCheckBox">
+              <property name="text">
+               <string>UTF-8 (Latin)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="utf8CyrCheckBox">
+              <property name="text">
+               <string>UTF-8 (Cyrillic)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_2">

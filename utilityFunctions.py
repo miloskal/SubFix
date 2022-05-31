@@ -1,4 +1,5 @@
 from os import remove, rename
+from CONSTANTS import *
 
 
 Lat2CyrUtf8Dic = {
@@ -62,7 +63,7 @@ Cyr2LatUtf8Dic = {v: k for k, v in Lat2CyrUtf8Dic.items()}
 
 # Removes <и> and <б> tags from file 
 def removeTags(file, enc):
-    if enc == "UTF-8 (Cyrillic)":
+    if enc == UTF8_CYR:
         encoding = "utf-8"
         with open (f"{file}_", "w", encoding=encoding) as g, \
             open (f"{file}", "r", encoding=encoding) as f:
@@ -71,7 +72,7 @@ def removeTags(file, enc):
                                     replace("</и>", "").\
                                     replace("<б>","").\
                                     replace("</б>",""), file=g)
-    elif enc == "UTF-8 (Latin)":
+    elif enc == UTF8_LAT:
         encoding = "utf-8"
         with open (f"{file}_", "w", encoding=encoding) as g, \
             open (f"{file}", "r", encoding=encoding) as f:
@@ -80,7 +81,7 @@ def removeTags(file, enc):
                                     replace("</i>", "").\
                                     replace("<b>","").\
                                     replace("</b>",""), file=g)
-    elif enc == "Windows 1250 (Latin)":
+    elif enc == CP1250:
         encoding = "cp1250"
         with open (f"{file}_", "w", encoding=encoding) as g, \
             open (f"{file}", "r", encoding=encoding) as f:
@@ -89,7 +90,7 @@ def removeTags(file, enc):
                                     replace("</i>", "").\
                                     replace("<b>","").\
                                     replace("</b>",""), file=g)
-    elif enc == "Windows 1251 (Cyrillic)":
+    elif enc == CP1251:
         encoding = "cp1251"
         with open (f"{file}_", "w", encoding=encoding) as g, \
             open (f"{file}", "r", encoding=encoding) as f:
@@ -165,21 +166,20 @@ def cp1251ToCp1250(file):
     utf8ToCp1250(file)
 
 def utf8ToCp1250(file):
-    with open(f"{file}.cp1250", "w", encoding="cp1250") as g, \
+    with open(f"{file}_", "w", encoding="cp1250") as g, \
          open(file, "r", errors="ignore", encoding="utf-8") as f:
         for line in f:
             print(line.rstrip(), file=g)
     remove(file)
-    rename(f"{file}.cp1250", file)
+    rename(f"{file}_", file)
 
 def utf8ToCp1251(file):
-    with open(f"{file}.cp1251", "w", encoding="cp1251") as g, \
+    with open(f"{file}_", "w", encoding="cp1251") as g, \
          open(file, "r", errors="ignore", encoding="utf-8") as f:
         for line in f:
             print(line.rstrip(), file=g)
     remove(file)
-    rename(f"{file}.cp1251", file)
-
+    rename(f"{file}_", file)
 
 def utf8Convert(file, direction="cyr"):
     """

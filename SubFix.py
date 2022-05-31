@@ -9,9 +9,8 @@ from PyQt6.QtWidgets import QApplication, QWidget, QDialog, QFileDialog, \
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QKeySequence, QIcon, QShortcut
 import PyQt6.uic as uic
 from pathlib import Path
-from platform import system
+from shutil import copy
 
-__platform__ = system()
 
 class MainWindow(QDialog):
 
@@ -44,17 +43,60 @@ class MainWindow(QDialog):
         self.ui.fpsSubtitlesListView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         self.ui.codepageSubtitlesListView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         self.ui.convertToSrtListView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        self.ui.oldCodepageComboBox.currentIndexChanged.connect(self.onOldCodepageChanged)
+        self.ui.cp1250CheckBox.setChecked(True)
+        self.ui.cp1251CheckBox.setChecked(True)
+        self.ui.utf8LatCheckBox.setChecked(True)
+        self.ui.utf8CyrCheckBox.setChecked(True)
+        self.oldCodepageComboBox.setCurrentText(UTF8_CYR)
+
+        self.filenames = []
+        self.filenamesSub = []
+        
+    def checkAllComboBoxes(self):
+        self.ui.cp1250CheckBox.setEnabled(True)
+        self.ui.cp1251CheckBox.setEnabled(True)
+        self.ui.utf8LatCheckBox.setEnabled(True)
+        self.ui.utf8CyrCheckBox.setEnabled(True)
+        self.ui.cp1250CheckBox.setChecked(True)
+        self.ui.cp1251CheckBox.setChecked(True)
+        self.ui.utf8LatCheckBox.setChecked(True)
+        self.ui.utf8CyrCheckBox.setChecked(True)
+
+
+    #slot
+    def onOldCodepageChanged(self):
+        text = self.oldCodepageComboBox.currentText()
+        if text == CP1250:
+            self.checkAllComboBoxes()
+            self.ui.cp1250CheckBox.setChecked(False)
+            self.ui.cp1250CheckBox.setEnabled(False)
+        elif text == CP1251:
+            self.checkAllComboBoxes()
+            self.ui.cp1251CheckBox.setChecked(False)
+            self.ui.cp1251CheckBox.setEnabled(False)
+        elif text == UTF8_LAT:
+            self.checkAllComboBoxes()
+            self.ui.utf8LatCheckBox.setChecked(False)
+            self.ui.utf8LatCheckBox.setEnabled(False)
+        elif text == UTF8_CYR:
+            self.checkAllComboBoxes()
+            self.ui.utf8CyrCheckBox.setChecked(False)
+            self.ui.utf8CyrCheckBox.setEnabled(False)
 
     #slot
     def convertToSrt(self):
         """
         Converts .sub to .srt
         """
+        if not self.filenamesSub:
+            self.failure("Please import subtitles first")
+            return
         encoding = self.ui.convertToSrtEncodingComboBox.currentText()
         fps = float(self.ui.convertToSrtFpsComboBox.currentText())
-        if encoding == "Windows 1250 (Latin)":
+        if encoding == CP1250:
             enc = "cp1250"
-        elif encoding == "Windows 1251 (Cyrillic)":
+        elif encoding == CP1251:
             enc = "cp1251"
         else:
             enc = "utf-8"
@@ -79,11 +121,7 @@ class MainWindow(QDialog):
 
     #slot
     def browseForSrtSubtitle(self):
-        if __platform__ == "Linux":
-            directory = "/home"
-        elif __platform__ == "Windows":
-            directory = "C:\\\\Users"
-        self.filenames = QFileDialog.getOpenFileNames(parent=self, directory=directory,
+        self.filenames = QFileDialog.getOpenFileNames(parent=self,
                                              caption="Browse for subtitles",
                                              filter="Subtitle files (*.srt | *.txt)")
         self.filenames = self.filenames[0]
@@ -95,11 +133,7 @@ class MainWindow(QDialog):
     
     #slot
     def browseForSubSubtitle(self):
-        if __platform__ == "Linux":
-            directory = "/home"
-        elif __platform__ == "Windows":
-            directory = "C:\\\\Users"
-        self.filenamesSub = QFileDialog.getOpenFileNames(parent=self, directory=directory,
+        self.filenamesSub = QFileDialog.getOpenFileNames(parent=self,
                                              caption="Browse for subtitles",
                                              filter="Subtitle files (*.sub | *.txt)")
         self.filenamesSub = self.filenamesSub[0]
@@ -113,86 +147,99 @@ class MainWindow(QDialog):
     #slot
     def translateCodepage(self):
         oldCodepage = self.ui.oldCodepageComboBox.currentText()
-        newCodepage = self.ui.newCodepageComboBox.currentText()
-        if oldCodepage == "Windows 1250 (Latin)" and\
-            newCodepage == "UTF-8 (Latin)":
-            for file in self.filenames:
-                cp1250ToUtf8(file)
-            self.success("Conversion cp1250 --> utf8(latin) done")
-        elif oldCodepage == "Windows 1250 (Latin)" and\
-             newCodepage == "Windows 1251 (Cyrillic)":
-            for file in self.filenames:
-                cp1250ToCp1251(file)
-            self.success("Conversion cp1250(latin) --> cp1251(cyrillic) done")
-        elif oldCodepage == "Windows 1251 (Cyrillic)" and\
-             newCodepage == "Windows 1250 (Latin)":
-            for file in self.filenames:
-                cp1251ToCp1250(file)
-            self.success("Conversion cp1251(cyrillic) --> cp1250(latin) done")
-        elif oldCodepage == "Windows 1250 (Latin)" and\
-             newCodepage == "UTF-8 (Cyrillic)":
-            for file in self.filenames:
-                cp1250ToUtf8(file)
-                utf8Convert(file, direction="cyr")
-            self.success("Conversion cp1250 --> utf8(cyrillic) done")
-        elif oldCodepage == "UTF-8 (Cyrillic)" and\
-             newCodepage == "UTF-8 (Latin)":
-            for file in self.filenames:
-                utf8Convert(file, direction="lat")
-            self.success("Conversion utf8(cyrillic) --> utf8(latin) done")
-        elif oldCodepage == "UTF-8 (Latin)" and\
-             newCodepage == "UTF-8 (Cyrillic)":
-            for file in self.filenames:
-                utf8Convert(file, direction="cyr")
-            self.success("Conversion utf8(latin) --> utf8(cyrillic) done")
-        elif oldCodepage == "UTF-8 (Latin)" and\
-             newCodepage == "Windows 1250 (Latin)":
-            for file in self.filenames:
-                utf8ToCp1250(file)
-            self.success("Conversion utf8(latin) --> cp1250 done")
-        elif oldCodepage == "UTF-8 (Cyrillic)" and\
-             newCodepage == "Windows 1250 (Latin)":
-            for file in self.filenames:
-                utf8Convert(file, direction="lat")
-                utf8ToCp1250(file)
-            self.success("Conversion utf8(cyrillic) --> cp1250 done")
-        elif oldCodepage == "Windows 1251 (Cyrillic)" and\
-             newCodepage == "UTF-8 (Cyrillic)":
-            for file in self.filenames:
-                cp1251ToUtf8(file)
-            self.success("Conversion cp1251(cyrillic) --> utf8(cyrillic) done")
-        elif oldCodepage == "Windows 1251 (Cyrillic)" and\
-             newCodepage == "UTF-8 (Latin)":
-            for file in self.filenames:
-                cp1251ToUtf8(file)
-                utf8Convert(file, direction="lat")
-            self.success("Conversion cp1251(cyrillic) --> utf8(latin) done")
-        elif oldCodepage == "UTF-8 (Cyrillic)" and\
-             newCodepage == "Windows 1251 (Cyrillic)":
-            for file in self.filenames:
-                utf8ToCp1251(file)
-            self.success("Conversion utf8(cyrillic) --> cp1251(cyrillic) done")
-        elif oldCodepage == "UTF-8 (Latin)" and\
-             newCodepage == "Windows 1251 (Cyrillic)":
-            for file in self.filenames:
-                utf8Convert(file, direction="cyr")
-                utf8ToCp1251(file)
-        else:
-            self.failure("Conversion failed.")
+        generateCp1250 = self.ui.cp1250CheckBox.isEnabled() and self.ui.cp1250CheckBox.isChecked()
+        generateCp1251 = self.ui.cp1251CheckBox.isEnabled() and self.ui.cp1251CheckBox.isChecked()
+        generateUtf8Lat = self.ui.utf8LatCheckBox.isEnabled() and self.ui.utf8LatCheckBox.isChecked()
+        generateUtf8Cyr = self.ui.utf8CyrCheckBox.isEnabled() and self.ui.utf8CyrCheckBox.isChecked()
+
+        if not self.filenames:
+            self.failure("Please import subtitles first")
             return
+
+        for src in self.filenames:
+            if oldCodepage == CP1250:
+                if generateCp1251:
+                    dst = f"{src[:-4]} cp1251 cyr.srt"
+                    copy(src, dst)
+                    cp1250ToCp1251(dst)
+                    removeTags(dst, CP1251)
+                if generateUtf8Lat:
+                    dst = f"{src[:-4]} utf-8 lat.srt"
+                    copy(src, dst)
+                    cp1250ToUtf8(dst)
+                    removeTags(dst, UTF8_LAT)
+                if generateUtf8Cyr:
+                    dst = f"{src[:-4]} utf-8 cyr.srt"
+                    copy(src, dst)
+                    cp1250ToUtf8(dst)
+                    utf8Convert(dst, direction="cyr")
+                    removeTags(dst, UTF8_CYR)
+            elif oldCodepage == CP1251:
+                if generateCp1250:
+                    dst = f"{src[:-4]} cp1250 lat.srt"
+                    copy(src, dst)
+                    cp1251ToCp1250(dst)
+                    removeTags(dst, CP1250)
+                if generateUtf8Lat:
+                    dst = f"{src[:-4]} utf-8 lat.srt"
+                    copy(src, dst)
+                    cp1251ToUtf8(dst)
+                    utf8Convert(dst, direction="lat")
+                    removeTags(dst, UTF8_LAT)
+                if generateUtf8Cyr:
+                    dst = f"{src[:-4]} utf-8 cyr.srt"
+                    copy(src, dst)
+                    cp1251ToUtf8(dst)
+                    removeTags(dst, UTF8_CYR)
+            elif oldCodepage == UTF8_LAT:
+                if generateCp1250:
+                    dst = f"{src[:-4]} cp1250 lat.srt"
+                    copy(src, dst)
+                    utf8ToCp1250(dst)
+                    removeTags(dst, CP1250)
+                if generateCp1251:
+                    dst = f"{src[:-4]} cp1251 cyr.srt"
+                    copy(src, dst)
+                    utf8Convert(dst, direction="cyr")
+                    utf8ToCp1251(dst)
+                    removeTags(dst, CP1251)
+                if generateUtf8Cyr:
+                    dst = f"{src[:-4]} utf-8 cyr.srt"
+                    copy(src, dst)
+                    utf8Convert(dst, direction="cyr")
+                    removeTags(dst, UTF8_CYR)
+            elif oldCodepage == UTF8_CYR:
+                if generateCp1250:
+                    dst = f"{src[:-4]} cp1250 lat.srt"
+                    copy(src, dst)
+                    utf8Convert(dst, direction="lat")
+                    utf8ToCp1250(dst)
+                    removeTags(dst, CP1250)
+                if generateCp1251:
+                    dst = f"{src[:-4]} cp1251 cyr.srt"
+                    copy(src, dst)
+                    utf8ToCp1251(dst)
+                    removeTags(dst, CP1251)
+                if generateUtf8Lat:
+                    dst = f"{src[:-4]} utf-8 lat.srt"
+                    copy(src, dst)
+                    utf8Convert(dst, direction="lat")
+                    removeTags(dst, UTF8_LAT)
+        self.success("Conversion finished")
         
-        for file in self.filenames:
-            removeTags(file, newCodepage)
 
 
     #slot
     def correctSubtitleFps(self):
+        if not self.filenames:
+            self.failure("Please import subtitles first")
+            return
         oldFps = float(self.ui.oldFpsComboBox.currentText())
         newFps = float(self.ui.newFpsComboBox.currentText())
         enc = self.ui.fpsEncodingComboBox.currentText()
-        if enc == "Windows 1250 (Latin)":
+        if enc == CP1250:
             encoding = "cp1250"
-        elif enc == "Windows 1251 (Cyrillic)":
+        elif enc == CP1251:
             encoding = "cp1251"
         elif enc == "UTF-8":
             encoding = "utf-8"
@@ -213,10 +260,13 @@ class MainWindow(QDialog):
 
     #slot
     def rewindSubtitle(self):
+        if not self.filenames:
+            self.failure("Please import subtitles first")
+            return
         enc = self.ui.rewindEncodingComboBox.currentText()
-        if enc == "Windows 1250 (Latin)":
+        if enc == CP1250:
             encoding = "cp1250"
-        elif enc == "Windows 1251 (Cyrillic)":
+        elif enc == CP1251:
             encoding = "cp1251"
         elif enc == "UTF-8":
             encoding = "utf-8"
