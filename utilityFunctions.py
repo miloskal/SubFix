@@ -138,8 +138,17 @@ def milisecondsToTimestamp(ms):
     result = f"{hours:02d}:{minutes:02d}:{secs:02d},{miliseconds:03d}"
     return result
 
+def replaceBadChars(file, encoding):
+    with open(f"{file}_", "w", encoding=encoding) as g, \
+         open(file, encoding=encoding) as f: 
+            for line in f:
+                line = line.replace("´", "'")
+                print(line.rstrip(), file=g)
+    remove(file)
+    rename(f"{file}_", file)
 
 def cp1250ToUtf8(file):
+    replaceBadChars(file, "cp1250")
     with open(f"{file}.utf8", "w", encoding="utf-8") as g, \
          open(file, "r", errors="ignore", encoding="cp1250") as f:
         for line in f:
@@ -148,6 +157,7 @@ def cp1250ToUtf8(file):
     rename(f"{file}.utf8", file)
 
 def cp1251ToUtf8(file):
+    replaceBadChars(file, "cp1251")
     with open(f"{file}.utf8", "w", encoding="utf-8") as g, \
          open(file, "r", errors="ignore", encoding="cp1251") as f:
         for line in f:
@@ -156,16 +166,19 @@ def cp1251ToUtf8(file):
     rename(f"{file}.utf8", file)
 
 def cp1250ToCp1251(file):
+    replaceBadChars(file, "cp1250")
     cp1250ToUtf8(file)
     utf8Convert(file, direction="cyr")
     utf8ToCp1251(file)
 
 def cp1251ToCp1250(file):
+    replaceBadChars(file, "cp1251")
     cp1251ToUtf8(file)
     utf8Convert(file, direction="lat")
     utf8ToCp1250(file)
 
 def utf8ToCp1250(file):
+    replaceBadChars(file, "utf-8")
     with open(f"{file}_", "w", encoding="cp1250") as g, \
          open(file, "r", errors="ignore", encoding="utf-8") as f:
         for line in f:
@@ -174,6 +187,7 @@ def utf8ToCp1250(file):
     rename(f"{file}_", file)
 
 def utf8ToCp1251(file):
+    replaceBadChars(file, "utf-8")
     with open(f"{file}_", "w", encoding="cp1251") as g, \
          open(file, "r", errors="ignore", encoding="utf-8") as f:
         for line in f:
