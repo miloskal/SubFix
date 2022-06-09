@@ -142,7 +142,7 @@ def replaceBadChars(file, encoding):
     with open(f"{file}_", "w", encoding=encoding) as g, \
          open(file, encoding=encoding) as f: 
             for line in f:
-                line = line.replace("´", "'")
+                line = line.replace("´", "'").replace("ě", "i").replace("ň", "n")
                 print(line.rstrip(), file=g)
     remove(file)
     rename(f"{file}_", file)

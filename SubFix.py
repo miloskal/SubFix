@@ -257,6 +257,9 @@ class MainWindow(QDialog):
                         out.write(result + "\n")
                     else:
                         out.write(line)
+            rename(output, input)
+        self.success(f"Conversion {self.ui.oldFpsComboBox.currentText()} --> \
+                                   {self.ui.newFpsComboBox.currentText()} FPS finished")
 
     #slot
     def rewindSubtitle(self):
