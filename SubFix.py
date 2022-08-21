@@ -10,6 +10,44 @@ from PyQt6.QtGui import QStandardItemModel, QStandardItem, QKeySequence, QIcon, 
 import PyQt6.uic as uic
 from pathlib import Path
 from shutil import copy
+from types import MethodType
+
+
+
+def _dragEnterEvent(self, event):
+    if event.mimeData().hasUrls():
+        event.accept()
+    else:
+        event.ignore()
+
+def _dragMoveEvent(self, event):
+        event.accept()
+
+def _dropEvent(self, event):
+    items = [u.toLocalFile() for u in event.mimeData().urls()]
+    items = list(filter(lambda x: x.endswith(".srt") or x.endswith(".txt"), items))
+    for item in items:
+        x = QStandardItem(item)
+        x.setEditable(False)
+        self.model().appendRow(x)
+
+# _drag/_drop functions ending with '2' are just for .sub->.srt list view
+def _dragEnterEvent2(self, event):
+    if event.mimeData().hasUrls():
+        event.accept()
+    else:
+        event.ignore()
+
+def _dragMoveEvent2(self, event):
+        event.accept()
+
+def _dropEvent2(self, event):
+    items = [u.toLocalFile() for u in event.mimeData().urls()]
+    items = list(filter(lambda x: x.endswith(".sub") or x.endswith(".txt"), items))
+    for item in items:
+        x = QStandardItem(item)
+        x.setEditable(False)
+        self.model().appendRow(x)
 
 
 class MainWindow(QDialog):
@@ -49,10 +87,27 @@ class MainWindow(QDialog):
         self.ui.utf8LatCheckBox.setChecked(True)
         self.ui.utf8CyrCheckBox.setChecked(True)
         self.oldCodepageComboBox.setCurrentText(UTF8_CYR)
-
+        self.ui.rewindSubtitlesListView.setAcceptDrops(True)
+        self.ui.rewindSubtitlesListView.dragEnterEvent = MethodType(_dragEnterEvent, self.ui.rewindSubtitlesListView)
+        self.ui.rewindSubtitlesListView.dragMoveEvent = MethodType(_dragMoveEvent, self.ui.rewindSubtitlesListView)
+        self.ui.rewindSubtitlesListView.dropEvent = MethodType(_dropEvent, self.ui.rewindSubtitlesListView)
+        self.ui.codepageSubtitlesListView.setAcceptDrops(True)
+        self.ui.codepageSubtitlesListView.dragEnterEvent = MethodType(_dragEnterEvent, self.ui.codepageSubtitlesListView)
+        self.ui.codepageSubtitlesListView.dragMoveEvent = MethodType(_dragMoveEvent, self.ui.codepageSubtitlesListView)
+        self.ui.codepageSubtitlesListView.dropEvent = MethodType(_dropEvent, self.ui.codepageSubtitlesListView)
+        self.ui.fpsSubtitlesListView.setAcceptDrops(True)
+        self.ui.fpsSubtitlesListView.dragEnterEvent = MethodType(_dragEnterEvent, self.ui.fpsSubtitlesListView)
+        self.ui.fpsSubtitlesListView.dragMoveEvent = MethodType(_dragMoveEvent, self.ui.fpsSubtitlesListView)
+        self.ui.fpsSubtitlesListView.dropEvent = MethodType(_dropEvent, self.ui.fpsSubtitlesListView)
+        self.ui.convertToSrtListView.setAcceptDrops(True)
+        self.ui.convertToSrtListView.dragEnterEvent = MethodType(_dragEnterEvent2, self.ui.convertToSrtListView)
+        self.ui.convertToSrtListView.dragMoveEvent = MethodType(_dragMoveEvent2, self.ui.convertToSrtListView)
+        self.ui.convertToSrtListView.dropEvent = MethodType(_dropEvent2, self.ui.convertToSrtListView)
         self.filenames = []
         self.filenamesSub = []
         
+
+
     def checkAllComboBoxes(self):
         self.ui.cp1250CheckBox.setEnabled(True)
         self.ui.cp1251CheckBox.setEnabled(True)

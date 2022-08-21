@@ -279,3 +279,19 @@ def correctFpsInLine(line, oldFps, newFps):
     timestamp2 = frameToTimestamp(frame2, newFps)
     result = f"{timestamp1} --> {timestamp2}"
     return result
+
+def dragEnterEvent(self, event):
+    if event.mimeData().hasUrls():
+        event.accept()
+        print("Drag event")
+    else:
+        event.ignore()
+
+
+def dropEvent(self, event):
+    files = [u.toLocalFile() for u in event.mimeData().urls()]
+    for f in files:
+        print(f)
+
+def dragMoveEvent(self, event):
+        event.accept()

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -354,6 +354,9 @@
          </item>
          <item>
           <widget class="QListView" name="rewindSubtitlesListView">
+           <property name="acceptDrops">
+            <bool>true</bool>
+           </property>
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subtitles&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
