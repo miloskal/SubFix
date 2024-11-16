@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from sys import argv
-from regex import compile, match
+from re import compile, match
 from utilityFunctions import *
 
 from PyQt6.QtWidgets import QApplication, QWidget, QDialog, QFileDialog, \
@@ -55,9 +55,7 @@ class MainWindow(QDialog):
     TIMESTAMP_LINE_REGEX = compile("[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> "\
                    "[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3}")
 
-    SUB_LINE_REGEX = compile("\{(\d+)\}\{(\d+)\}\s*(.*)(\r)?(\n)?")
-
-    ARROW_SPLIT_REGEX = compile(" --> ")
+    SUB_LINE_REGEX = compile(r"\{(\d+)\}\{(\d+)\}\s*(.*)(\r)?(\n)?")
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
