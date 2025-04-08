@@ -263,7 +263,8 @@ def utf8Convert(file, direction="cyr"):
                     ch
                 ) in (
                     line
-                ):  # convert utf-8 number to his corresponding number from dictionary
+                ):  # convert utf-8 number to his corresponding
+                    # number from dictionary
                     w = ord(ch)
                     v = Lat2CyrUtf8Dic.get(w)
                     if v is not None:

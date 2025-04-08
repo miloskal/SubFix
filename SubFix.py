@@ -20,6 +20,7 @@ from PyQt6.QtGui import (
 from PyQt6 import uic
 from UtilityFunctions import *
 
+
 def _dragEnterEvent(self, event):
     if event.mimeData().hasUrls():
         event.accept()
