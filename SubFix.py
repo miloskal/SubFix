@@ -1,29 +1,24 @@
 #!/usr/bin/python3
 
 from sys import argv
-from re import compile, match
-from UtilityFunctions import *
+from re import compile
+from shutil import copy
+from types import MethodType
 
 from PyQt6.QtWidgets import (
     QApplication,
-    QWidget,
     QDialog,
     QFileDialog,
-    QComboBox,
     QMessageBox,
     QAbstractItemView,
 )
 from PyQt6.QtGui import (
     QStandardItemModel,
     QStandardItem,
-    QKeySequence,
     QIcon,
-    QShortcut,
 )
-import PyQt6.uic as uic
-from pathlib import Path
-from shutil import copy
-from types import MethodType
+from PyQt6 import uic
+from UtilityFunctions import *
 
 
 def _dragEnterEvent(self, event):
@@ -72,6 +67,8 @@ def _dropEvent2(self, event):
 
 
 class MainWindow(QDialog):
+    """Main Window which appears on opening application.
+    """
 
     TIMESTAMP_LINE_REGEX = compile(
         "[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> "
@@ -228,10 +225,12 @@ class MainWindow(QDialog):
                         endFps = int(match.group(2))
                         content = match.group(3)
                         content = content.replace("|", "\n")
-                        original = f"[{cnt}] startFps='{startFps}' endFps='{endFps}' content='{content}'"
+                        # original = (f"[{cnt}] startFps='{startFps}' "
+                        #             f"endFps='{endFps}' content='{content}'")
                         startTimestamp = frameToTimestamp(startFps, fps)
                         endTimestamp = frameToTimestamp(endFps, fps)
-                        corrected = f"{cnt}\n{startTimestamp} --> {endTimestamp}\n{content}\n\n"
+                        corrected = (f"{cnt}\n{startTimestamp} --> "
+                                     f"{endTimestamp}\n{content}\n\n")
                         dst.write(corrected)
                     else:
                         print(f"no match in line {cnt}: {line}")
@@ -394,8 +393,8 @@ class MainWindow(QDialog):
                         out.write(line)
             rename(output, input)
         self.success(
-            f"Conversion {self.ui.oldFpsComboBox.currentText()} --> \
-                                   {self.ui.newFpsComboBox.currentText()} FPS finished"
+            (f"Conversion {self.ui.oldFpsComboBox.currentText()} --> "
+             f"{self.ui.newFpsComboBox.currentText()} FPS finished")
         )
 
     # slot
@@ -432,10 +431,10 @@ class MainWindow(QDialog):
         self.success("Done")
 
     def success(self, message):
-        window = QMessageBox.information(self, "Success", message)
+        QMessageBox.information(self, "Success", message)
 
     def failure(self, message):
-        window = QMessageBox.critical(self, "Failure", message)
+        QMessageBox.critical(self, "Failure", message)
 
 
 # main
