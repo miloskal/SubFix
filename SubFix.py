@@ -2,7 +2,7 @@
 
 from sys import argv
 from re import compile, match
-from utilityFunctions import *
+from UtilityFunctions import *
 
 from PyQt6.QtWidgets import (
     QApplication,
