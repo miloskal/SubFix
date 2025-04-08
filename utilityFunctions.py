@@ -214,7 +214,7 @@ def utf8Convert(file, direction="cyr"):
                 for ch in line: # convert utf-8 number to his corresponding number from dictionary
                     w = ord(ch)
                     v = Lat2CyrUtf8Dic.get(w)  
-                    if v != None: 
+                    if v is not None:
                         out.write(chr(v))
                     else:
                         out.write(ch)
@@ -240,7 +240,7 @@ def utf8Convert(file, direction="cyr"):
                 for ch in line: 
                     w = ord(ch)
                     v = Cyr2LatUtf8Dic.get(w)  
-                    if v != None: 
+                    if v is not None:
                         out.write(chr(v))
                     elif w == 1039: # Џ --> Dž 
                         out.write("Dž")
