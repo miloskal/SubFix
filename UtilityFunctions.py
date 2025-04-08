@@ -259,11 +259,7 @@ def utf8Convert(file, direction="cyr"):
             open(file, "r", encoding=enc) as f,
         ):
             for line in f:
-                for (
-                    ch
-                ) in (
-                    line
-                ):  # convert utf-8 number to his corresponding
+                for ch in line:  # convert utf-8 number to his corresponding
                     # number from dictionary
                     w = ord(ch)
                     v = Lat2CyrUtf8Dic.get(w)
