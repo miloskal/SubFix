@@ -10,12 +10,13 @@ from PyQt6.QtWidgets import (
     QDialog,
     QFileDialog,
     QMessageBox,
-    QAbstractItemView,
 )
 from PyQt6.QtGui import (
     QStandardItemModel,
     QStandardItem,
     QIcon,
+    QKeySequence,
+    QShortcut,
 )
 from PyQt6 import uic
 from UtilityFunctions import *
@@ -67,8 +68,7 @@ def _dropEvent2(self, event):
 
 
 class MainWindow(QDialog):
-    """Main Window which appears on opening application.
-    """
+    """Main Window which appears on opening application."""
 
     TIMESTAMP_LINE_REGEX = compile(
         "[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> "
@@ -103,18 +103,18 @@ class MainWindow(QDialog):
         self.ui.fpsSubtitlesListView.setModel(self.model)
         self.ui.codepageSubtitlesListView.setModel(self.model)
         self.ui.convertToSrtListView.setModel(self.modelSub)
-        self.ui.rewindSubtitlesListView.setSelectionMode(
-            QAbstractItemView.SelectionMode.NoSelection
-        )
-        self.ui.fpsSubtitlesListView.setSelectionMode(
-            QAbstractItemView.SelectionMode.NoSelection
-        )
-        self.ui.codepageSubtitlesListView.setSelectionMode(
-            QAbstractItemView.SelectionMode.NoSelection
-        )
-        self.ui.convertToSrtListView.setSelectionMode(
-            QAbstractItemView.SelectionMode.NoSelection
-        )
+        # self.ui.rewindSubtitlesListView.setSelectionMode(
+        #    QAbstractItemView.SelectionMode.NoSelection
+        # )
+        # self.ui.fpsSubtitlesListView.setSelectionMode(
+        #    QAbstractItemView.SelectionMode.NoSelection
+        # )
+        # self.ui.codepageSubtitlesListView.setSelectionMode(
+        #    QAbstractItemView.SelectionMode.NoSelection
+        # )
+        # self.ui.convertToSrtListView.setSelectionMode(
+        #    QAbstractItemView.SelectionMode.NoSelection
+        # )
         self.ui.oldCodepageComboBox.currentIndexChanged.connect(
             self.onOldCodepageChanged
         )
@@ -164,6 +164,24 @@ class MainWindow(QDialog):
         self.ui.convertToSrtListView.dropEvent = MethodType(
             _dropEvent2, self.ui.convertToSrtListView
         )
+
+        mykey = QKeySequence.StandardKey.Delete
+        self.deleteRewindShortcut = QShortcut(
+            mykey,
+            self.ui.rewindSubtitlesListView,
+            member=self.onDeleteRewindRow,
+        )
+        self.deleteFpsShortcut = QShortcut(
+            mykey, self.ui.fpsSubtitlesListView, member=self.onDeleteFpsRow
+        )
+        self.deleteCodepageShortcut = QShortcut(
+            mykey,
+            self.ui.codepageSubtitlesListView,
+            member=self.onDeleteCodepageRow,
+        )
+        self.deleteSubShortcut = QShortcut(
+            mykey, self.ui.convertToSrtListView, member=self.onDeleteSubRow
+        )
         self.filenames = []
         self.filenamesSub = []
 
@@ -177,7 +195,6 @@ class MainWindow(QDialog):
         self.ui.utf8LatCheckBox.setChecked(True)
         self.ui.utf8CyrCheckBox.setChecked(True)
 
-
     def syncModelWithFilenames(self):
         total = self.model.rowCount()
         if not total == len(self.filenames):
@@ -189,14 +206,37 @@ class MainWindow(QDialog):
             self.filenamesSub.clear()
             for i in range(total):
                 self.filenamesSub.append(self.modelSub.item(i).text())
-        print("=" * 90)
-        print("Contents of self.filenames:")
-        for elem in self.filenames:
-            print(elem)
-        print("Contents of self.filenamesSub:")
-        for elem in self.filenamesSub:
-            print(elem)
 
+    def onDeleteRewindRow(self):
+        ixs = self.ui.rewindSubtitlesListView.selectedIndexes()
+        for i in ixs:
+            q = self.model.takeRow(i.row())
+            del q
+        self.syncModelWithFilenames()
+
+    # slot
+    def onDeleteFpsRow(self):
+        ixs = self.ui.fpsSubtitlesListView.selectedIndexes()
+        for i in ixs:
+            q = self.model.takeRow(i.row())
+            del q
+        self.syncModelWithFilenames()
+
+    # slot
+    def onDeleteCodepageRow(self):
+        ixs = self.ui.codepageSubtitlesListView.selectedIndexes()
+        for i in ixs:
+            q = self.model.takeRow(i.row())
+            del q
+        self.syncModelWithFilenames()
+
+    # slot
+    def onDeleteSubRow(self):
+        ixs = self.ui.convertToSrtListView.selectedIndexes()
+        for i in ixs:
+            q = self.modelSub.takeRow(i.row())
+            del q
+        self.syncModelWithFilenames()
 
     # slot
     def onOldCodepageChanged(self):
@@ -220,9 +260,7 @@ class MainWindow(QDialog):
 
     # slot
     def convertToSrt(self):
-        """
-        Converts .sub to .srt
-        """
+        """Converts .sub to .srt."""
         self.syncModelWithFilenames()
         if not self.filenamesSub:
             self.failure("Please import subtitles first")
@@ -251,8 +289,10 @@ class MainWindow(QDialog):
                         #             f"endFps='{endFps}' content='{content}'")
                         startTimestamp = frameToTimestamp(startFps, fps)
                         endTimestamp = frameToTimestamp(endFps, fps)
-                        corrected = (f"{cnt}\n{startTimestamp} --> "
-                                     f"{endTimestamp}\n{content}\n\n")
+                        corrected = (
+                            f"{cnt}\n{startTimestamp} --> "
+                            f"{endTimestamp}\n{content}\n\n"
+                        )
                         dst.write(corrected)
                     else:
                         print(f"no match in line {cnt}: {line}")
@@ -417,8 +457,10 @@ class MainWindow(QDialog):
                         out.write(line)
             rename(output, input)
         self.success(
-            (f"Conversion {self.ui.oldFpsComboBox.currentText()} --> "
-             f"{self.ui.newFpsComboBox.currentText()} FPS finished")
+            (
+                f"Conversion {self.ui.oldFpsComboBox.currentText()} --> "
+                f"{self.ui.newFpsComboBox.currentText()} FPS finished"
+            )
         )
 
     # slot
@@ -437,7 +479,17 @@ class MainWindow(QDialog):
         else:
             self.failure("Invalid encoding")
             return
-        delay = int(self.ui.rewindMilisecondsLineEdit.text())
+        try:
+            entered = self.ui.rewindMilisecondsLineEdit.text()
+            delay = int(entered)
+        except ValueError:
+            self.failure(
+                (
+                    f"Wrong value ('{entered}').\n\nPlease enter "
+                    f"delay in miliseconds."
+                )
+            )
+            return
         for input in self.filenames:
             output = f"{input}.out"
             with (

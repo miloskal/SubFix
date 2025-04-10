@@ -444,7 +444,8 @@ disable=raw-checker-failed,
         missing-module-docstring,
         unused-argument,
         no-name-in-module,
-        unused-wildcard-import
+        unused-wildcard-import,
+        too-many-instance-attributes
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
