@@ -271,8 +271,13 @@ class MainWindow(QDialog):
             enc = "cp1250"
         elif encoding == CP1251:
             enc = "cp1251"
-        else:
+        elif encoding == CP1252:
+            enc = "cp1252"
+        elif encoding == "UTF-8":
             enc = "utf-8"
+        else:
+            self.failure("Invalid encoding")
+            return
         for file in self.filenamesSub:
             with (
                 open(file, encoding=enc) as src,
@@ -435,6 +440,8 @@ class MainWindow(QDialog):
             encoding = "cp1250"
         elif enc == CP1251:
             encoding = "cp1251"
+        elif enc == CP1252:
+            encoding = "cp1252"
         elif enc == "UTF-8":
             encoding = "utf-8"
         else:
@@ -474,6 +481,8 @@ class MainWindow(QDialog):
             encoding = "cp1250"
         elif enc == CP1251:
             encoding = "cp1251"
+        elif enc == CP1252:
+            encoding = "cp1252"
         elif enc == "UTF-8":
             encoding = "utf-8"
         else:

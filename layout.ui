@@ -73,6 +73,11 @@
              </item>
              <item>
               <property name="text">
+               <string>Windows 1252 (Latin)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>UTF-8</string>
               </property>
              </item>
@@ -400,6 +405,11 @@
              </item>
              <item>
               <property name="text">
+               <string>Windows 1252 (Latin)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>UTF-8</string>
               </property>
              </item>
@@ -554,6 +564,11 @@
              <item>
               <property name="text">
                <string>Windows 1251 (Cyrillic)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Windows 1252 (Latin)</string>
               </property>
              </item>
              <item>

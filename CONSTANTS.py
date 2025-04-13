@@ -1,4 +1,5 @@
 CP1250 = "Windows 1250 (Latin)"
 CP1251 = "Windows 1251 (Cyrillic)"
+CP1252 = "Windows 1252 (Latin)"
 UTF8_LAT = "UTF-8 (Latin)"
 UTF8_CYR = "UTF-8 (Cyrillic)"
